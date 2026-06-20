@@ -6,6 +6,7 @@ import ArchetypeBadge from '../components/ArchetypeBadge';
 import Card from '../components/Card';
 import { statRadarData } from '../lib/compScore';
 import { ARCHETYPE_META, colorOf } from '../lib/archetypes';
+import { avatarUrl } from '../lib/avatar';
 import { utilTone, cn } from '../lib/format';
 
 const UTIL_TEXT = { good: 'text-good', warn: 'text-warn', bad: 'text-bad' };
@@ -84,9 +85,11 @@ export default function SuspectBoard() {
               }
             >
               <div className="flex items-center gap-3">
-                <div className="grid h-12 w-12 place-items-center rounded-xl text-base font-bold" style={{ background: `${colorOf(sel.archetype)}22`, color: colorOf(sel.archetype), border: `1px solid ${colorOf(sel.archetype)}55` }}>
-                  {sel.name.split(' ').map((s) => s[0]).join('')}
-                </div>
+                <div
+                  className="h-12 w-12 shrink-0 rounded-xl bg-cover bg-center"
+                  style={{ backgroundColor: `${colorOf(sel.archetype)}22`, border: `1px solid ${colorOf(sel.archetype)}55`, backgroundImage: `url(${avatarUrl(sel.id)})` }}
+                  title={sel.name}
+                />
                 <div>
                   <div className="text-base font-semibold text-text-hi">{sel.name}</div>
                   <div className="text-xs text-text-dim">{sel.department}</div>

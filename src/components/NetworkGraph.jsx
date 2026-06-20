@@ -1,4 +1,5 @@
 import { Suspense, lazy, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { avatarUrl } from '../lib/avatar';
 
 // Lazy: react-force-graph-2d is canvas-only and heavy; keep it out of the main bundle.
 const ForceGraph2D = lazy(() => import('react-force-graph-2d'));
@@ -28,6 +29,19 @@ export default function NetworkGraph({ graph, selectedId, onSelect, highlightIds
     }),
     [graph]
   );
+
+  // Preload a person photo per node; refresh the canvas once each loads.
+  const fgRef = useRef(null);
+  const imgCache = useRef(new Map());
+  useEffect(() => {
+    for (const n of data.nodes) {
+      if (imgCache.current.has(n.id)) continue;
+      const img = new Image();
+      img.src = avatarUrl(n.id);
+      img.onload = () => fgRef.current?.refresh?.();
+      imgCache.current.set(n.id, img);
+    }
+  }, [data]);
 
   // adjacency from raw string ids for highlight logic
   const neighbors = useMemo(() => {
@@ -73,13 +87,35 @@ export default function NetworkGraph({ graph, selectedId, onSelect, highlightIds
       ctx.fill();
       ctx.shadowBlur = 0;
 
+      // person photo clipped into the bubble (the colored fill above is the fallback)
+      const img = imgCache.current.get(node.id);
+      if (img && img.complete && img.naturalWidth > 0) {
+        const s = Math.min(img.naturalWidth, img.naturalHeight); // center-crop to square
+        const sx = (img.naturalWidth - s) / 2;
+        const sy = (img.naturalHeight - s) / 2;
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(node.x, node.y, r, 0, 2 * Math.PI);
+        ctx.closePath();
+        ctx.clip();
+        ctx.drawImage(img, sx, sy, s, s, node.x - r, node.y - r, 2 * r, 2 * r);
+        ctx.restore();
+      }
+
+      // archetype-colored base ring keeps the role readable over the photo
+      ctx.lineWidth = 1.5 / scale;
+      ctx.strokeStyle = node.color;
+      ctx.beginPath();
+      ctx.arc(node.x, node.y, r, 0, 2 * Math.PI);
+      ctx.stroke();
+
       // callout / selection / team ring
       const ring = team ? '#2DE2E6' : CALLOUT_RING[node.callout] || (node.id === selectedId ? '#EAF2FF' : null);
       if (ring) {
-        ctx.lineWidth = 2 / scale;
+        ctx.lineWidth = 2.5 / scale;
         ctx.strokeStyle = ring;
         ctx.beginPath();
-        ctx.arc(node.x, node.y, r + 3 / scale, 0, 2 * Math.PI);
+        ctx.arc(node.x, node.y, r + 2.5 / scale, 0, 2 * Math.PI);
         ctx.stroke();
       }
 
@@ -106,6 +142,7 @@ export default function NetworkGraph({ graph, selectedId, onSelect, highlightIds
     <div ref={wrapRef} className="h-full w-full">
       <Suspense fallback={<div className="grid h-full place-items-center text-text-dim">Loading network…</div>}>
         <ForceGraph2D
+          ref={fgRef}
           width={size.w}
           height={size.h}
           graphData={data}

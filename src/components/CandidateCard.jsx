@@ -1,6 +1,8 @@
+import { useState } from 'react';
 import { Crown } from 'lucide-react';
 import ArchetypeBadge from './ArchetypeBadge';
 import { ARCHETYPE_META, colorOf } from '../lib/archetypes';
+import { avatarUrl } from '../lib/avatar';
 import { cn } from '../lib/format';
 
 const BARS = [
@@ -9,19 +11,20 @@ const BARS = [
   { key: 'synergy', label: 'Synergy', color: '#8B5CF6' },
 ];
 
-const Avatar = ({ name, archetype }) => {
-  const color = colorOf(archetype);
-  const initials = (name || '?')
+const Avatar = ({ person }) => {
+  const [err, setErr] = useState(false);
+  const color = colorOf(person.archetype);
+  const initials = (person.name || '?')
     .split(/\s+/)
     .slice(0, 2)
     .map((s) => s[0]?.toUpperCase())
     .join('');
   return (
     <div
-      className="grid h-10 w-10 shrink-0 place-items-center rounded-xl text-sm font-bold"
+      className="grid h-10 w-10 shrink-0 place-items-center overflow-hidden rounded-xl text-sm font-bold"
       style={{ background: `${color}22`, color, border: `1px solid ${color}55` }}
     >
-      {initials}
+      {err ? initials : <img src={avatarUrl(person.id)} alt={person.name} onError={() => setErr(true)} className="h-full w-full object-cover" />}
     </div>
   );
 };
@@ -43,7 +46,7 @@ export default function CandidateCard({ pick, best = false }) {
       style={best ? { borderColor: '#FFD23F88' } : undefined}
     >
       <div className="flex items-center gap-3">
-        <Avatar name={person.name} archetype={person.archetype} />
+        <Avatar person={person} />
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
             <span className="truncate text-sm font-semibold text-text-hi">{person.name}</span>
