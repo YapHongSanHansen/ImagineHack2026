@@ -1,12 +1,14 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import { AppProvider, useApp } from './context/AppContext';
 import AppShell from './components/AppShell';
+import Engine from './pages/Engine';
 import Dashboard from './pages/Dashboard';
 import SuspectBoard from './pages/SuspectBoard';
 import DraftLab from './pages/DraftLab';
 import Insights from './pages/Insights';
 
 const PAGES = {
+  engine: Engine,
   dashboard: Dashboard,
   network: SuspectBoard,
   draft: DraftLab,

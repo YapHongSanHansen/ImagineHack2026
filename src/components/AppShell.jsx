@@ -1,8 +1,9 @@
-import { LayoutDashboard, Network, Wand2, Leaf, RotateCcw, Swords } from 'lucide-react';
+import { LayoutDashboard, Network, Wand2, Leaf, RotateCcw, Swords, Cpu } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { cn } from '../lib/format';
 
 const NAV = [
+  { id: 'engine', label: 'Allocation Engine', icon: Cpu, hint: 'Build a team' },
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, hint: 'Monitor' },
   { id: 'network', label: 'Suspect Board', icon: Network, hint: 'ONA graph' },
   { id: 'draft', label: 'Draft Lab', icon: Wand2, hint: 'Re-draft' },

@@ -1,11 +1,24 @@
 import { createContext, useContext, useMemo, useState } from 'react';
-import employees from '../data/employees.json';
+import dataset from '../data/dataset.json';
 import teams from '../data/teams.json';
-import relationships from '../data/relationships.json';
 import afterState from '../data/afterState.json';
 import { SCOREBOARD, PROJECTED, HERO_TEAM_ID, TITAN_HEALTH } from '../data/scoreboard';
 import { byId, teamHealth, centralityAll, wasteMetrics } from '../lib/analysis';
 import { buildGraph } from '../lib/ona';
+import { clamp } from '../lib/format';
+
+const employees = dataset.employees;
+
+// Derive collaboration edges from the spec's synergy_matrix.
+// Edge weight = collaboration strength (past_collaborations); sentiment kept for the engine.
+const relationships = Object.entries(dataset.synergy_matrix).map(([key, v]) => {
+  const [source, target] = key.split('_');
+  return { source, target, weight: clamp(v.past_collaborations / 12, 0.05, 1), sentiment: v.sentiment_score, type: 'collab' };
+});
+
+// Symmetric sentiment lookup for the allocation engine.
+const sentimentOf = (a, b) =>
+  dataset.synergy_matrix[`${a}_${b}`]?.sentiment_score ?? dataset.synergy_matrix[`${b}_${a}`]?.sentiment_score ?? 0;
 
 /*
  * CANONICAL DATA CONTRACT
@@ -19,7 +32,7 @@ import { buildGraph } from '../lib/ona';
 const AppContext = createContext(null);
 
 export function AppProvider({ children }) {
-  const [tab, setTab] = useState('dashboard');
+  const [tab, setTab] = useState('engine');
   const [selectedNodeId, setSelectedNodeId] = useState(null);
   const [selectedProjectId, setSelectedProjectId] = useState(HERO_TEAM_ID);
   const [orgFixed, setOrgFixed] = useState(false); // flips Dashboard to the "after" state
@@ -41,6 +54,8 @@ export function AppProvider({ children }) {
     employees,
     teams,
     relationships,
+    synergyMatrix: dataset.synergy_matrix,
+    synergyOf: sentimentOf,
     peopleById,
     centrality,
     graph,

@@ -5,7 +5,7 @@ const ForceGraph2D = lazy(() => import('react-force-graph-2d'));
 
 const CALLOUT_RING = { HUB: '#2DE2E6', SILO: '#FFC857', SPOF: '#FF4D6D' };
 
-export default function NetworkGraph({ graph, selectedId, onSelect }) {
+export default function NetworkGraph({ graph, selectedId, onSelect, highlightIds = null }) {
   const wrapRef = useRef(null);
   const [size, setSize] = useState({ w: 800, h: 520 });
 
@@ -41,11 +41,17 @@ export default function NetworkGraph({ graph, selectedId, onSelect }) {
     return m;
   }, [graph]);
 
+  const hi = useMemo(() => (highlightIds && highlightIds.length ? new Set(highlightIds) : null), [highlightIds]);
+
   const endId = (e) => (typeof e === 'object' && e ? e.id : e);
   const isLit = useCallback(
-    (id) => !selectedId || id === selectedId || neighbors.get(selectedId)?.has(id),
-    [selectedId, neighbors]
+    (id) => {
+      if (hi) return hi.has(id);
+      return !selectedId || id === selectedId || neighbors.get(selectedId)?.has(id);
+    },
+    [selectedId, neighbors, hi]
   );
+  const inTeam = useCallback((id) => hi?.has(id) ?? false, [hi]);
 
   const paintNode = useCallback(
     (node, ctx, scale) => {
@@ -55,10 +61,11 @@ export default function NetworkGraph({ graph, selectedId, onSelect }) {
       ctx.save();
       ctx.globalAlpha = alpha;
 
-      // glow for hero / selected nodes
-      if (node.callout || node.id === selectedId) {
-        ctx.shadowColor = CALLOUT_RING[node.callout] || node.color;
-        ctx.shadowBlur = 18;
+      // glow for hero / selected / drafted-team nodes
+      const team = inTeam(node.id);
+      if (node.callout || node.id === selectedId || team) {
+        ctx.shadowColor = team ? '#2DE2E6' : CALLOUT_RING[node.callout] || node.color;
+        ctx.shadowBlur = team ? 22 : 18;
       }
       ctx.beginPath();
       ctx.arc(node.x, node.y, r, 0, 2 * Math.PI);
@@ -66,8 +73,8 @@ export default function NetworkGraph({ graph, selectedId, onSelect }) {
       ctx.fill();
       ctx.shadowBlur = 0;
 
-      // callout / selection ring
-      const ring = CALLOUT_RING[node.callout] || (node.id === selectedId ? '#EAF2FF' : null);
+      // callout / selection / team ring
+      const ring = team ? '#2DE2E6' : CALLOUT_RING[node.callout] || (node.id === selectedId ? '#EAF2FF' : null);
       if (ring) {
         ctx.lineWidth = 2 / scale;
         ctx.strokeStyle = ring;
@@ -76,8 +83,8 @@ export default function NetworkGraph({ graph, selectedId, onSelect }) {
         ctx.stroke();
       }
 
-      // labels for hero + selected
-      if ((node.callout || node.id === selectedId) && lit) {
+      // labels for hero + selected + drafted team
+      if ((node.callout || node.id === selectedId || team) && lit) {
         const fs = 11 / scale;
         ctx.font = `600 ${fs}px "Space Grotesk", sans-serif`;
         ctx.textAlign = 'center';
@@ -92,7 +99,7 @@ export default function NetworkGraph({ graph, selectedId, onSelect }) {
       }
       ctx.restore();
     },
-    [isLit, selectedId]
+    [isLit, selectedId, inTeam]
   );
 
   return (
@@ -116,10 +123,17 @@ export default function NetworkGraph({ graph, selectedId, onSelect }) {
             ctx.fill();
           }}
           linkColor={(l) => {
+            if (hi) {
+              const both = hi.has(endId(l.source)) && hi.has(endId(l.target));
+              return both ? 'rgba(45,226,230,0.9)' : 'rgba(147,164,200,0.05)';
+            }
             const lit = isLit(endId(l.source)) && isLit(endId(l.target));
             return lit ? 'rgba(147,164,200,0.35)' : 'rgba(147,164,200,0.06)';
           }}
-          linkWidth={(l) => 0.5 + l.weight * 2.5}
+          linkWidth={(l) => {
+            const both = hi && hi.has(endId(l.source)) && hi.has(endId(l.target));
+            return (both ? 1.5 : 0.5) + l.weight * (both ? 3.5 : 2.5);
+          }}
           onNodeClick={(n) => onSelect?.(n.id)}
           onBackgroundClick={() => onSelect?.(null)}
         />
