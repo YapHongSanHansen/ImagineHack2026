@@ -1,0 +1,68 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+  body {
+    @apply bg-abyss text-text-hi antialiased font-sans;
+    margin: 0;
+    background-image:
+      radial-gradient(900px 500px at 75% -10%, rgba(139, 92, 246, 0.18), transparent 60%),
+      radial-gradient(700px 500px at 10% 110%, rgba(45, 226, 230, 0.12), transparent 60%);
+    background-attachment: fixed;
+  }
+  /* faint dot-grid overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    background-image: radial-gradient(rgba(147, 164, 200, 0.06) 1px, transparent 1px);
+    background-size: 26px 26px;
+  }
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #1f2a40;
+    border-radius: 999px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+}
+
+@layer components {
+  .panel {
+    @apply rounded-2xl border border-stroke bg-panel/70 backdrop-blur-md;
+  }
+  .panel-2 {
+    @apply rounded-2xl border border-stroke bg-panel2/70 backdrop-blur-md;
+  }
+  .kpi {
+    @apply font-display tabular-nums tracking-tight;
+  }
+  .label-xs {
+    @apply text-[11px] uppercase tracking-[0.18em] text-text-dim;
+  }
+  .chip {
+    @apply inline-flex items-center gap-1.5 rounded-full border border-stroke px-2.5 py-1 text-xs;
+  }
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 font-semibold text-abyss
+      bg-gradient-to-br from-cyan to-violet shadow-glow transition
+      hover:brightness-110 active:scale-[0.98] disabled:opacity-50;
+  }
+  .grad-text {
+    @apply bg-gradient-to-br from-cyan to-violet bg-clip-text text-transparent;
+  }
+}

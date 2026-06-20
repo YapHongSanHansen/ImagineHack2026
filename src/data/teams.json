@@ -1,0 +1,8 @@
+[
+  { "id": "t01", "name": "Project Titan", "status": "broken", "memberIds": ["e01", "e02", "e03", "e04", "e05"], "requiredComposition": { "jungler": 1, "gold": 1, "exp": 1, "mid": 1, "roam": 1 }, "requiredSkills": ["backend", "data", "pm", "agile", "comms"] },
+  { "id": "t02", "name": "Aurora Launch", "status": "healthy", "memberIds": ["e06", "e09", "e11", "e14"], "requiredComposition": { "gold": 1, "mid": 1, "exp": 1, "roam": 1 }, "requiredSkills": ["growth", "api", "frontend", "agile"] },
+  { "id": "t03", "name": "Helios Ops", "status": "strained", "memberIds": ["e13", "e07", "e12"], "requiredComposition": { "gold": 1, "exp": 1, "roam": 2 }, "requiredSkills": ["ops", "comms", "research"] },
+  { "id": "t04", "name": "Nimbus Sales", "status": "understaffed", "memberIds": [], "requiredComposition": { "jungler": 1, "gold": 2, "mid": 1, "roam": 1 }, "requiredSkills": ["sales", "growth", "pm", "comms"] },
+  { "id": "t05", "name": "Pulse Platform", "status": "understaffed", "memberIds": [], "requiredComposition": { "jungler": 2, "gold": 1, "exp": 1, "mid": 1 }, "requiredSkills": ["backend", "data", "api", "pm"] },
+  { "id": "t06", "name": "Bench", "status": "bench", "memberIds": ["e08", "e10", "e15", "e16"], "requiredComposition": {}, "requiredSkills": [] }
+]

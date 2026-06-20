@@ -1,0 +1,21 @@
+{
+  "projectId": "t01",
+  "projectName": "Project Titan",
+  "summary": "Broke up a 5-Executor pile-up: kept 1 Core Executor, re-drafted 4 idle bench players into the open roles, and redeployed the surplus executors to Pulse Platform.",
+  "picks": [
+    { "slot": "JUNGLER", "status": "KEPT", "person": { "id": "e01", "name": "Ravi Menon", "archetype": "JUNGLER", "avatarSeed": "ravi-menon-01" }, "score": 0.82, "breakdown": { "fit": 1.0, "availability": 0.05, "synergy": 0.7, "antiBurnout": -0.15 } },
+    { "slot": "GOLD", "status": "DRAFTED", "person": { "id": "e08", "name": "Chloe Wong", "archetype": "GOLD", "avatarSeed": "chloe-wong-08" }, "score": 0.78, "breakdown": { "fit": 1.0, "availability": 0.65, "synergy": 0.55, "antiBurnout": 0 } },
+    { "slot": "EXP", "status": "DRAFTED", "person": { "id": "e16", "name": "Wesley Goh", "archetype": "EXP", "avatarSeed": "wesley-goh-16" }, "score": 0.71, "breakdown": { "fit": 1.0, "availability": 0.72, "synergy": 0.25, "antiBurnout": 0 } },
+    { "slot": "MID", "status": "DRAFTED", "person": { "id": "e10", "name": "Sara Kim", "archetype": "MID", "avatarSeed": "sara-kim-10" }, "score": 0.76, "breakdown": { "fit": 1.0, "availability": 0.70, "synergy": 0.5, "antiBurnout": 0 } },
+    { "slot": "ROAM", "status": "DRAFTED", "person": { "id": "e15", "name": "Omar Farouk", "archetype": "ROAM", "avatarSeed": "omar-farouk-15" }, "score": 0.74, "breakdown": { "fit": 1.0, "availability": 0.68, "synergy": 0.5, "antiBurnout": 0 } }
+  ],
+  "redeployed": [
+    { "id": "e02", "name": "Arjun Rao", "to": "t05", "toName": "Pulse Platform" },
+    { "id": "e03", "name": "Bao Nguyen", "to": "t05", "toName": "Pulse Platform" },
+    { "id": "e04", "name": "Leon Tan", "to": "t05", "toName": "Pulse Platform" },
+    { "id": "e05", "name": "Hassan Ali", "to": "t05", "toName": "Pulse Platform" }
+  ],
+  "teamHealth": { "before": 38, "after": 84 },
+  "newComposition": { "jungler": 1, "gold": 1, "exp": 1, "mid": 1, "roam": 1 },
+  "utilAfter": { "e01": 76, "e02": 73, "e03": 71, "e04": 58, "e05": 73, "e08": 70, "e10": 65, "e15": 67, "e16": 63 }
+}
