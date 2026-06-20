@@ -58,6 +58,7 @@ export default function SuspectBoard() {
             CALLOUTS.map((c) => {
               const pid = ins[c.tag.toLowerCase()];
               const p = peopleById[pid];
+              if (!p) return null;
               return (
                 <button
                   key={c.tag}

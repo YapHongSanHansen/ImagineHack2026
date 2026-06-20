@@ -5,7 +5,7 @@ import Card from '../components/Card';
 import RadarComp from '../components/RadarComp';
 import RingGauge from '../components/RingGauge';
 import { orgMixData } from '../lib/compScore';
-import { colorOf, normalizeComp, ARCHETYPE_META } from '../lib/archetypes';
+import { colorOf, ARCHETYPE_META } from '../lib/archetypes';
 import { healthTone, cn } from '../lib/format';
 
 const HEALTH_TEXT = { good: 'text-good', warn: 'text-warn', bad: 'text-bad' };
@@ -32,21 +32,25 @@ function CompDots({ memberIds, peopleById }) {
 }
 
 export default function Dashboard() {
-  const { employees, teams, peopleById, scoreboard, teamHealthById, orgFixed, goTo, titanHealth } = useApp();
+  const { employees, teams, peopleById, scoreboard, teamHealthById, orgFixed, goTo, titanHealth, afterState } = useApp();
   const sb = scoreboard;
   const v = (m) => (orgFixed ? m.after : m.before);
   const tone = (kind) => (orgFixed ? 'good' : kind);
 
-  const burnout = employees.filter((e) => e.utilization > 90).sort((a, b) => b.utilization - a.utilization);
+  // effective utilization reflects the re-draft once the org is optimized
+  const effUtil = (e) => (orgFixed && afterState.utilAfter[e.id] != null ? afterState.utilAfter[e.id] : e.utilization);
+  const burnout = employees.filter((e) => effUtil(e) > 90).sort((a, b) => effUtil(b) - effUtil(a));
   const mix = orgMixData(employees);
-  const orgHealth = orgFixed ? 86 : 49;
+  const nonBenchTeams = teams.filter((t) => t.status !== 'bench');
+  const avgHealth = Math.round(nonBenchTeams.reduce((s, t) => s + (teamHealthById[t.id]?.score ?? 0), 0) / (nonBenchTeams.length || 1));
+  const orgHealth = orgFixed ? 86 : avgHealth;
 
   return (
     <div className="space-y-6">
       <header className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold text-text-hi">Workforce Command</h1>
-          <p className="text-sm text-text-dim">Live manpower allocation across {teams.filter((t) => t.id !== 't06').length} teams · {employees.length} people</p>
+          <p className="text-sm text-text-dim">Live manpower allocation across {nonBenchTeams.length} teams · {employees.length} people</p>
         </div>
         <div className={cn('chip', orgFixed ? 'text-good' : 'text-bad')} style={{ borderColor: orgFixed ? '#34E5A155' : '#FF4D6D55' }}>
           <span className={cn('h-2 w-2 rounded-full', orgFixed ? 'bg-good' : 'bg-bad animate-pulse')} />
@@ -101,7 +105,7 @@ export default function Dashboard() {
       <div className="grid gap-4 lg:grid-cols-2">
         <Card title="Teams" subtitle="Composition & health">
           <div className="space-y-2">
-            {teams.filter((t) => t.id !== 't06').map((t) => {
+            {nonBenchTeams.map((t) => {
               const st = TEAM_STATUS[t.status] || TEAM_STATUS.bench;
               const h = Math.round(teamHealthById[t.id]?.score ?? 0);
               const heroFixed = orgFixed && t.id === 't01';
@@ -119,7 +123,7 @@ export default function Dashboard() {
                         {heroFixed ? 'Healthy' : st.label}
                       </span>
                     </div>
-                    <div className="mt-1.5"><CompDots memberIds={heroFixed ? ['e01', 'e08', 'e16', 'e10', 'e15'] : t.memberIds} peopleById={peopleById} /></div>
+                    <div className="mt-1.5"><CompDots memberIds={heroFixed ? afterState.picks.map((p) => p.person.id) : t.memberIds} peopleById={peopleById} /></div>
                   </div>
                   <div className="text-right">
                     <div className={cn('kpi text-lg font-bold', HEALTH_TEXT[healthTone(shown)])}>{shown}</div>
@@ -133,7 +137,7 @@ export default function Dashboard() {
 
         <Card title="Burnout Watchlist" subtitle="People over 90% utilization" right={<Flame size={16} className="text-bad" />}>
           <div className="space-y-2">
-            {(orgFixed ? burnout.filter((e) => e.id === 'e13') : burnout).map((e) => (
+            {burnout.map((e) => (
               <button
                 key={e.id}
                 onClick={() => goTo('network', { node: e.id })}
@@ -144,12 +148,10 @@ export default function Dashboard() {
                   <div className="text-sm font-medium text-text-hi">{e.name}</div>
                   <div className="text-[11px] text-text-dim">{ARCHETYPE_META[e.archetype].corp} · {e.department}</div>
                 </div>
-                <div className="kpi text-base font-bold text-bad">{e.utilization}%</div>
+                <div className="kpi text-base font-bold text-bad">{effUtil(e)}%</div>
               </button>
             ))}
-            {orgFixed && burnout.filter((e) => e.id === 'e13').length === 0 && (
-              <p className="text-sm text-good">All clear — no burnout risks.</p>
-            )}
+            {burnout.length === 0 && <p className="text-sm text-good">All clear — no burnout risks.</p>}
           </div>
         </Card>
       </div>

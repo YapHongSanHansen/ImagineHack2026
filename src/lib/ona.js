@@ -17,8 +17,12 @@ export function buildGraph(people, edges) {
   let hub = people[0]?.id;
   let silo = people[0]?.id;
   for (const p of people) {
-    if (cen[p.id].degree > cen[hub].degree) hub = p.id;
-    if (cen[p.id].degree < cen[silo].degree) silo = p.id;
+    const c = cen[p.id];
+    // hub: highest degree, tie-break by weighted degree
+    if (c.degree > cen[hub].degree || (c.degree === cen[hub].degree && c.weightedDegree > cen[hub].weightedDegree)) hub = p.id;
+    // silo: most isolated — lowest degree, tie-break by lowest weighted degree (so the
+    // truly-disconnected node wins over an equally-low-degree but well-bonded one)
+    if (c.degree < cen[silo].degree || (c.degree === cen[silo].degree && c.weightedDegree < cen[silo].weightedDegree)) silo = p.id;
   }
   const articulationIds = people.filter((p) => cen[p.id].isArticulation).map((p) => p.id);
   const spof = articulationIds

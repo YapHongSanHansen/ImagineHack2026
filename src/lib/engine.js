@@ -17,9 +17,12 @@ const KEYWORDS = [
 // Parse a free-text project goal into a 4-dim target vector.
 export function parseGoalToVector(goal = '') {
   const text = goal.toLowerCase();
+  // tokenize on non-alphanumerics so short keywords ('ai', 'app', 'ml') match whole
+  // words only — substring includes() would match 'ai' inside 'available'/'campaign'.
+  const tokens = new Set(text.split(/[^a-z0-9]+/).filter(Boolean));
   const v = [0, 0, 0, 0];
   for (const { dim, words } of KEYWORDS) {
-    for (const w of words) if (text.includes(w)) v[dim] += 1;
+    for (const w of words) if (tokens.has(w)) v[dim] += 1;
   }
   if (v.every((x) => x === 0)) return { vector: [1, 1, 1, 1], normalized: [0.5, 0.5, 0.5, 0.5] };
   const max = Math.max(...v);
@@ -69,6 +72,7 @@ export function runAllocation({ goal, workload, employees, synergyOf, balance = 
   const gSum = normalized.reduce((a, b) => a + b, 0) || 1;
   const teamCov = [0, 0, 0, 0];
   const team = [];
+  const scratch = new Map(); // per-run cap/syn, kept OFF the shared employee objects
   const remaining = [...employees];
 
   while (team.length < size && remaining.length) {
@@ -92,8 +96,7 @@ export function runAllocation({ goal, workload, employees, synergyOf, balance = 
       if (!best || combined > best.combined) best = { cand, cap, syn, combined };
     }
     team.push(best.cand);
-    best.cand.__cap = best.cap;
-    best.cand.__syn = best.syn;
+    scratch.set(best.cand.id, { cap: best.cap, syn: best.syn });
     for (let i = 0; i < 4; i++) teamCov[i] = Math.max(teamCov[i], best.cand.skill_vector[i]);
     remaining.splice(remaining.indexOf(best.cand), 1);
   }
@@ -101,7 +104,7 @@ export function runAllocation({ goal, workload, employees, synergyOf, balance = 
   const members = team.map((e) => ({
     employee: e,
     capability: capability.get(e.id),
-    synergy: e.__syn ?? 0,
+    synergy: scratch.get(e.id)?.syn ?? 0,
     task: taskFor(e, vector),
   }));
 

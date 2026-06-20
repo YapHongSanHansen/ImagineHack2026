@@ -9,10 +9,10 @@ const BARS = [
   { key: 'synergy', label: 'Synergy', color: '#8B5CF6' },
 ];
 
-const Avatar = ({ seed, archetype }) => {
+const Avatar = ({ name, archetype }) => {
   const color = colorOf(archetype);
-  const initials = (seed || '?')
-    .split('-')
+  const initials = (name || '?')
+    .split(/\s+/)
     .slice(0, 2)
     .map((s) => s[0]?.toUpperCase())
     .join('');
@@ -43,7 +43,7 @@ export default function CandidateCard({ pick, best = false }) {
       style={best ? { borderColor: '#FFD23F88' } : undefined}
     >
       <div className="flex items-center gap-3">
-        <Avatar seed={person.avatarSeed} archetype={person.archetype} />
+        <Avatar name={person.name} archetype={person.archetype} />
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
             <span className="truncate text-sm font-semibold text-text-hi">{person.name}</span>
@@ -85,7 +85,7 @@ export default function CandidateCard({ pick, best = false }) {
         </div>
       )}
       {breakdown?.antiBurnout < 0 && (
-        <p className="mt-2 text-[10px] text-bad">⚠ burnout penalty applied — kept as the single Core Executor</p>
+        <p className="mt-2 text-[10px] text-bad">⚠ burnout penalty applied — currently over 90% utilization</p>
       )}
     </div>
   );

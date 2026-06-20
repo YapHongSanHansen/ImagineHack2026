@@ -1,10 +1,9 @@
 import { useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Play, Cpu, Scale, Sparkles, Users, Briefcase } from 'lucide-react';
+import { Play, Cpu, Scale, Users, Briefcase, Upload } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import NetworkGraph from '../components/NetworkGraph';
 import Card from '../components/Card';
-import ArchetypeBadge from '../components/ArchetypeBadge';
 import { runAllocation, teamSizeFor, parseGoalToVector, SKILL_DIMS } from '../lib/engine';
 import { colorOf } from '../lib/archetypes';
 import { cn } from '../lib/format';
@@ -36,6 +35,16 @@ export default function Engine() {
 
   const run = () => setResult(runAllocation({ goal, workload, employees, synergyOf, balance }));
 
+  // drop a project brief (.txt/.md) to populate the goal
+  const onDropBrief = (e) => {
+    e.preventDefault();
+    const file = e.dataTransfer.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => setGoal(String(reader.result).replace(/\s+/g, ' ').trim().slice(0, 400));
+    reader.readAsText(file);
+  };
+
   const memberByDept = (dept) => (result?.members || []).filter((m) => m.employee.department === dept);
 
   return (
@@ -53,10 +62,19 @@ export default function Engine() {
             <textarea
               value={goal}
               onChange={(e) => setGoal(e.target.value)}
+              onDragOver={(e) => e.preventDefault()}
+              onDrop={onDropBrief}
               rows={2}
               className="mt-2 w-full resize-none rounded-xl border border-stroke bg-panel2/60 px-3 py-2.5 text-sm text-text-hi outline-none focus:border-cyan/50"
               placeholder="e.g. Launch a mobile payments app on a tight timeline"
             />
+            <div
+              onDragOver={(e) => e.preventDefault()}
+              onDrop={onDropBrief}
+              className="mt-2 flex items-center justify-center gap-2 rounded-xl border border-dashed border-stroke bg-panel2/30 px-3 py-2 text-[11px] text-text-dim"
+            >
+              <Upload size={13} /> Drop a project brief (.txt / .md) to auto-fill the goal
+            </div>
             <div className="mt-2 flex flex-wrap gap-1.5">
               {PRESETS.map((p) => (
                 <button key={p} onClick={() => setGoal(p)} className={cn('chip text-[11px] transition', goal === p ? 'border-cyan/50 text-cyan' : 'text-text-dim hover:text-text-mid')}>
@@ -114,7 +132,7 @@ export default function Engine() {
       </Card>
 
       {/* MIDDLE WEB GRAPH */}
-      <Card title="Collaboration Web" subtitle={result ? 'Drafted team highlighted — links glow within the chosen cluster' : 'All employees & past collaboration channels'} right={<span className="text-[11px] text-text-dim">● size = centrality</span>}>
+      <Card title="The Giraffe Web Graph" subtitle={result ? 'Drafted team highlighted — links glow within the chosen cluster' : 'All employees & past collaboration channels'} right={<span className="text-[11px] text-text-dim">● size = centrality</span>}>
         <div className="relative h-[440px] overflow-hidden rounded-xl">
           <NetworkGraph graph={graph} highlightIds={result?.ids || null} selectedId={null} onSelect={() => {}} />
         </div>

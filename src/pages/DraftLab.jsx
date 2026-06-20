@@ -1,12 +1,13 @@
 import { useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Wand2, Zap, RotateCcw, ShieldCheck, Info, Sparkles } from 'lucide-react';
+import { Zap, RotateCcw, ShieldCheck, Info, Sparkles } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import BeforeAfter from '../components/BeforeAfter';
 import CandidateCard from '../components/CandidateCard';
 import Card from '../components/Card';
 import { recommendAllocation } from '../lib/allocate';
-import { ARCHETYPES, ARCHETYPE_META, colorOf, normalizeComp } from '../lib/archetypes';
+import { teamSizeFor } from '../lib/engine';
+import { ARCHETYPES, ARCHETYPE_META, colorOf } from '../lib/archetypes';
 import { cn } from '../lib/format';
 
 const METHOD = 'Score = 0.40·role-fit + 0.30·availability + 0.20·network-synergy − 0.15·burnout-risk';
@@ -37,12 +38,14 @@ export default function DraftLab() {
   const bestSlot = useMemo(() => afterState.picks.reduce((a, b) => (b.score > a.score ? b : a)).slot, [afterState]);
 
   // live engine for understaffed projects (workload-driven dynamic team size)
-  const teamSize = Math.ceil(workload / 2) + 1;
+  const teamSize = teamSizeFor(workload);
   const live = useMemo(() => {
     if (isHero) return null;
     const pool = employees.filter((e) => e.utilization < 80);
-    return recommendAllocation(project, pool, relationships);
-  }, [isHero, project, employees, relationships]);
+    return recommendAllocation(project, pool, relationships, teamSize);
+  }, [isHero, project, employees, relationships, teamSize]);
+  // ranked-by-score order for display (engine returns slot/scarcity order)
+  const rankedPicks = useMemo(() => [...(live?.picks || [])].sort((a, b) => b.score - a.score), [live]);
 
   const selectProject = (id) => {
     setSelectedProjectId(id);
@@ -66,8 +69,8 @@ export default function DraftLab() {
       </header>
 
       {/* project selector */}
-      <div className="grid gap-3 sm:grid-cols-3">
-        {teams.filter((t) => ['t01', 't04', 't05'].includes(t.id)).map((t) => {
+      <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-5">
+        {teams.filter((t) => t.status !== 'bench').map((t) => {
           const active = t.id === project.id;
           return (
             <button
@@ -156,7 +159,7 @@ export default function DraftLab() {
 
           <Card title={`Recommended draft — ${project.name}`} subtitle="Ranked by composite score">
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-              {(live?.picks || []).slice(0, Math.min(teamSize, live?.picks.length || 0)).map((pick, i) => (
+              {rankedPicks.map((pick, i) => (
                 <CandidateCard key={pick.slot + i} pick={pick} best={i === 0} />
               ))}
             </div>

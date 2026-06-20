@@ -20,7 +20,8 @@ export function scoreCandidate(person, targetArch, chosen, wm) {
 }
 
 // Greedy, scarcity-ordered, deterministic allocation.
-export function recommendAllocation(team, pool, edges) {
+// `size` (optional) caps the squad to a workload-driven team size.
+export function recommendAllocation(team, pool, edges, size) {
   const wm = edgeWeightMap(edges);
   const need = normalizeComp(team.requiredComposition);
   const slots = [];
@@ -30,10 +31,11 @@ export function recommendAllocation(team, pool, edges) {
   const decentCount = (arch) => pool.filter((p) => (PARTIAL_MATCH[p.archetype]?.[arch] ?? 0) >= 0.5).length;
   slots.sort((a, b) => decentCount(a) - decentCount(b));
 
+  const useSlots = size ? slots.slice(0, size) : slots;
   const used = new Set();
   const chosen = [];
   const picks = [];
-  for (const slot of slots) {
+  for (const slot of useSlots) {
     let best = null;
     for (const p of pool) {
       if (used.has(p.id)) continue;
