@@ -1,4 +1,4 @@
-# ADTEA — *Draft a winning team. Waste no one.*
+# ADTAE — *Draft a winning team. Waste no one.*
 
 An **AI-driven dynamic team allocation engine** with a **draft screen for your workforce.** Describe a project and DraftBoard AI drafts the optimal team from skills, availability and real collaboration history — then reads the whole org like a Mobile Legends (MLBB) team composition to expose burnout, idle bench and single points of failure.
 
