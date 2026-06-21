@@ -123,3 +123,34 @@ export function runAllocation({ goal, workload, employees, synergyOf, balance = 
     teamSentiment: pairSent.length ? mean(pairSent) : 0,
   };
 }
+
+// Heuristic project-workload estimator (1..10) used by the Command Center when a
+// brief is uploaded without a Gemini key. Scores by length + scope/integration keywords.
+export function estimateWorkload(text) {
+  const clean = (text || '').toLowerCase().trim();
+  if (!clean) return 3; // default baseline
+
+  let score = 2; // base score
+
+  // 1. Length complexity
+  const words = clean.split(/\s+/).length;
+  if (words > 120) score += 3;
+  else if (words > 60) score += 2;
+  else if (words > 20) score += 1;
+
+  // 2. High-scope keyword complexity
+  const highScope = ['scale', 'database', 'compliance', 'migration', 'payment', 'billing', 'architect', 'reliability', 'deploy', 'security', 'auth', 'multi-tenant'];
+  for (const word of highScope) {
+    if (clean.includes(word)) score += 0.5;
+  }
+
+  // 3. Technical integration complexity
+  const integrations = ['api', 'pipeline', 'kubernetes', 'aws', 'cloud', 'ci/cd', 'integration'];
+  let intCount = 0;
+  for (const word of integrations) {
+    if (clean.includes(word)) intCount++;
+  }
+  score += Math.min(2, intCount * 0.4);
+
+  return Math.max(1, Math.min(10, Math.round(score)));
+}

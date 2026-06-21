@@ -14,8 +14,8 @@
     @apply bg-abyss text-text-hi antialiased font-sans;
     margin: 0;
     background-image:
-      radial-gradient(900px 500px at 75% -10%, rgba(139, 92, 246, 0.18), transparent 60%),
-      radial-gradient(700px 500px at 10% 110%, rgba(45, 226, 230, 0.12), transparent 60%);
+      radial-gradient(900px 500px at 75% -10%, rgba(45, 212, 191, 0.18), transparent 60%),
+      radial-gradient(700px 500px at 10% 110%, rgba(16, 229, 161, 0.12), transparent 60%);
     background-attachment: fixed;
   }
   /* faint dot-grid overlay */
@@ -61,6 +61,10 @@
     @apply inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 font-semibold text-abyss
       bg-gradient-to-br from-cyan to-violet shadow-glow transition
       hover:brightness-110 active:scale-[0.98] disabled:opacity-50;
+  }
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl border border-stroke px-4 py-2
+      font-medium text-text-mid transition hover:text-text-hi hover:border-cyan/40 active:scale-[0.98];
   }
   .grad-text {
     @apply bg-gradient-to-br from-cyan to-violet bg-clip-text text-transparent;

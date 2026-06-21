@@ -2,12 +2,11 @@ import { Leaf, Coins, Flame, GitFork, TrendingUp, Sparkles, ArrowRight } from 'l
 import { useApp } from '../context/AppContext';
 import Card from '../components/Card';
 import StatCard from '../components/StatCard';
-import { cn } from '../lib/format';
 
 const TAG_COLOR = {
-  Efficiency: '#2DE2E6',
+  Efficiency: '#2DD4BF',
   Wellbeing: '#34E5A1',
-  ESG: '#8B5CF6',
+  ESG: '#5EEAD4',
   Resilience: '#FFC857',
 };
 

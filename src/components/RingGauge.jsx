@@ -1,6 +1,6 @@
 import { cn } from '../lib/format';
 
-const TONE = { good: '#34E5A1', warn: '#FFC857', bad: '#FF4D6D', cyan: '#2DE2E6', violet: '#8B5CF6' };
+const TONE = { good: '#34E5A1', warn: '#FFC857', bad: '#FF4D6D', cyan: '#10E5A1', violet: '#2DD4BF' };
 
 export default function RingGauge({ value = 0, size = 132, stroke = 11, tone = 'cyan', label, big }) {
   const r = (size - stroke) / 2;

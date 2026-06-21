@@ -15,7 +15,7 @@ const PRESETS = [
   'Run a go-to-market sales launch for Q3',
 ];
 
-const DIM_COLOR = ['#2DE2E6', '#FFD23F', '#F637EC', '#34E5A1'];
+const DIM_COLOR = ['#10E5A1', '#FFD23F', '#2DD4BF', '#5EEAD4'];
 const DEPT_ORDER = ['Engineering', 'Product', 'Design', 'Sales', 'Operations'];
 
 export default function Engine() {

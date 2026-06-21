@@ -6,9 +6,9 @@ import { avatarUrl } from '../lib/avatar';
 import { cn } from '../lib/format';
 
 const BARS = [
-  { key: 'fit', label: 'Role fit', color: '#2DE2E6' },
+  { key: 'fit', label: 'Role fit', color: '#10E5A1' },
   { key: 'availability', label: 'Availability', color: '#34E5A1' },
-  { key: 'synergy', label: 'Synergy', color: '#8B5CF6' },
+  { key: 'synergy', label: 'Synergy', color: '#2DD4BF' },
 ];
 
 const Avatar = ({ person }) => {

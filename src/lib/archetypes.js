@@ -8,8 +8,8 @@ export const ARCHETYPE_COLOR = {
   JUNGLER: '#FF6B3D',
   GOLD: '#FFD23F',
   EXP: '#5BE584',
-  MID: '#2DE2E6',
-  ROAM: '#8B5CF6',
+  MID: '#10E5A1',
+  ROAM: '#2DD4BF',
 };
 
 // radar / stat axes (one dominant axis per archetype)

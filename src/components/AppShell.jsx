@@ -1,13 +1,15 @@
-import { LayoutDashboard, Network, Wand2, Leaf, RotateCcw, Swords, Cpu } from 'lucide-react';
+import { LayoutDashboard, Network, Wand2, Leaf, RotateCcw, Swords, Cpu, Gauge, Users } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { cn } from '../lib/format';
 
 const NAV = [
+  { id: 'command', label: 'Command Center', icon: Gauge, hint: 'Crew & ONA' },
   { id: 'engine', label: 'Allocation Engine', icon: Cpu, hint: 'Build a team' },
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, hint: 'Monitor' },
   { id: 'network', label: 'Suspect Board', icon: Network, hint: 'ONA graph' },
   { id: 'draft', label: 'Draft Lab', icon: Wand2, hint: 'Re-draft' },
   { id: 'insights', label: 'Insights', icon: Leaf, hint: 'Sustainability' },
+  { id: 'roster', label: 'Workforce Roster', icon: Users, hint: 'CRUD & skills' },
 ];
 
 export default function AppShell({ children }) {
@@ -38,7 +40,7 @@ export default function AppShell({ children }) {
                   'group flex items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm transition',
                   active ? 'bg-cyan/10 text-text-hi shadow-glow' : 'text-text-mid hover:bg-panel2/60 hover:text-text-hi'
                 )}
-                style={active ? { borderLeft: '2px solid #2DE2E6' } : { borderLeft: '2px solid transparent' }}
+                style={active ? { borderLeft: '2px solid #10E5A1' } : { borderLeft: '2px solid transparent' }}
               >
                 <Icon size={18} className={active ? 'text-cyan' : 'text-text-dim group-hover:text-text-mid'} />
                 <span className="flex-1 font-medium">{n.label}</span>

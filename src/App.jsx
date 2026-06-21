@@ -1,18 +1,22 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import { AppProvider, useApp } from './context/AppContext';
 import AppShell from './components/AppShell';
+import CommandCenter from './pages/CommandCenter';
 import Engine from './pages/Engine';
 import Dashboard from './pages/Dashboard';
 import SuspectBoard from './pages/SuspectBoard';
 import DraftLab from './pages/DraftLab';
 import Insights from './pages/Insights';
+import Roster from './pages/Roster';
 
 const PAGES = {
+  command: CommandCenter,
   engine: Engine,
   dashboard: Dashboard,
   network: SuspectBoard,
   draft: DraftLab,
   insights: Insights,
+  roster: Roster,
 };
 
 function Shell() {

@@ -4,7 +4,7 @@ import { avatarUrl } from '../lib/avatar';
 // Lazy: react-force-graph-2d is canvas-only and heavy; keep it out of the main bundle.
 const ForceGraph2D = lazy(() => import('react-force-graph-2d'));
 
-const CALLOUT_RING = { HUB: '#2DE2E6', SILO: '#FFC857', SPOF: '#FF4D6D' };
+const CALLOUT_RING = { HUB: '#10E5A1', SILO: '#FFC857', SPOF: '#FF4D6D' };
 
 export default function NetworkGraph({ graph, selectedId, onSelect, highlightIds = null }) {
   const wrapRef = useRef(null);
@@ -78,7 +78,7 @@ export default function NetworkGraph({ graph, selectedId, onSelect, highlightIds
       // glow for hero / selected / drafted-team nodes
       const team = inTeam(node.id);
       if (node.callout || node.id === selectedId || team) {
-        ctx.shadowColor = team ? '#2DE2E6' : CALLOUT_RING[node.callout] || node.color;
+        ctx.shadowColor = team ? '#10E5A1' : CALLOUT_RING[node.callout] || node.color;
         ctx.shadowBlur = team ? 22 : 18;
       }
       ctx.beginPath();
@@ -110,7 +110,7 @@ export default function NetworkGraph({ graph, selectedId, onSelect, highlightIds
       ctx.stroke();
 
       // callout / selection / team ring
-      const ring = team ? '#2DE2E6' : CALLOUT_RING[node.callout] || (node.id === selectedId ? '#EAF2FF' : null);
+      const ring = team ? '#10E5A1' : CALLOUT_RING[node.callout] || (node.id === selectedId ? '#EAF2FF' : null);
       if (ring) {
         ctx.lineWidth = 2.5 / scale;
         ctx.strokeStyle = ring;
@@ -162,7 +162,7 @@ export default function NetworkGraph({ graph, selectedId, onSelect, highlightIds
           linkColor={(l) => {
             if (hi) {
               const both = hi.has(endId(l.source)) && hi.has(endId(l.target));
-              return both ? 'rgba(45,226,230,0.9)' : 'rgba(147,164,200,0.05)';
+              return both ? 'rgba(16,229,161,0.9)' : 'rgba(147,164,200,0.05)';
             }
             const lit = isLit(endId(l.source)) && isLit(endId(l.target));
             return lit ? 'rgba(147,164,200,0.35)' : 'rgba(147,164,200,0.06)';

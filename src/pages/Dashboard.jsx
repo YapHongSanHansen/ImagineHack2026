@@ -89,8 +89,8 @@ export default function Dashboard() {
             angleKey="role"
             domain={[0, 40]}
             series={[
-              { key: 'current', name: 'Current mix %', color: '#2DE2E6', fillOpacity: 0.25 },
-              { key: 'ideal', name: 'Balanced ideal %', color: '#8B5CF6', dashed: true, fillOpacity: 0.05 },
+              { key: 'current', name: 'Current mix %', color: '#10E5A1', fillOpacity: 0.25 },
+              { key: 'ideal', name: 'Balanced ideal %', color: '#2DD4BF', dashed: true, fillOpacity: 0.05 },
             ]}
           />
         </Card>

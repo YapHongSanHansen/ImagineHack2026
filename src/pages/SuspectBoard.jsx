@@ -5,14 +5,14 @@ import RadarComp from '../components/RadarComp';
 import ArchetypeBadge from '../components/ArchetypeBadge';
 import Card from '../components/Card';
 import { statRadarData } from '../lib/compScore';
-import { ARCHETYPE_META, colorOf } from '../lib/archetypes';
+import { colorOf } from '../lib/archetypes';
 import { avatarUrl } from '../lib/avatar';
 import { utilTone, cn } from '../lib/format';
 
 const UTIL_TEXT = { good: 'text-good', warn: 'text-warn', bad: 'text-bad' };
 
 const CALLOUTS = [
-  { tag: 'HUB', icon: Crown, color: '#2DE2E6', title: 'The Hub', desc: 'Holds the org together across every department — and is pinned at 97% utilization. Central + overloaded = burnout risk and a knowledge bottleneck.' },
+  { tag: 'HUB', icon: Crown, color: '#10E5A1', title: 'The Hub', desc: 'Holds the org together across every department — and is pinned at 97% utilization. Central + overloaded = burnout risk and a knowledge bottleneck.' },
   { tag: 'SPOF', icon: GitFork, color: '#FF4D6D', title: 'Single Point of Failure', desc: 'The only bridge between Sales and Engineering. Remove this person and the network splits — Sales loses all engineering context overnight.' },
   { tag: 'SILO', icon: EyeOff, color: '#FFC857', title: 'The Silo', desc: 'One weak connection, 28% utilization. The Design pod is invisible to the rest of the org — idle and disconnected.' },
 ];
