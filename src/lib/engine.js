@@ -62,8 +62,17 @@ function taskFor(employee, goalVector) {
 }
 
 // Greedy team selection that maximizes capability + average team sentiment.
-export function runAllocation({ goal, workload, employees, synergyOf, balance = false }) {
-  const { vector, normalized } = parseGoalToVector(goal);
+export function runAllocation({ goal, workload, employees, synergyOf, balance = false, skillVector = null }) {
+  let vector, normalized;
+  if (skillVector && skillVector.length === 4 && skillVector.some((x) => x > 0)) {
+    // Caller-supplied target vector (e.g. Gemini-derived skill weights) overrides
+    // keyword parsing. Cosine is scale-invariant; coverage uses the normalized form.
+    vector = skillVector;
+    const max = Math.max(...skillVector) || 1;
+    normalized = skillVector.map((x) => x / max);
+  } else {
+    ({ vector, normalized } = parseGoalToVector(goal));
+  }
   const size = Math.min(teamSizeFor(workload), employees.length);
 
   const capability = new Map(employees.map((e) => [e.id, cosineSimilarity(e.skill_vector, vector)]));
@@ -133,22 +142,33 @@ export function estimateWorkload(text) {
   let score = 2; // base score
 
   // 1. Length complexity
-  const words = clean.split(/\s+/).length;
-  if (words > 120) score += 3;
-  else if (words > 60) score += 2;
-  else if (words > 20) score += 1;
+  const words = clean.split(/\s+/).filter(Boolean);
+  if (words.length > 120) score += 3;
+  else if (words.length > 60) score += 2;
+  else if (words.length > 20) score += 1;
+
+  // Match keywords against word boundaries, not raw substrings, so 'auth' doesn't
+  // fire on "author" and 'api' doesn't fire on "capital"/"rapid". Short abbreviations
+  // match whole-word only; longer keywords match as a word-start prefix (so 'payment'
+  // still catches "payments", 'deploy' catches "deployment"); phrases use includes.
+  const tokens = new Set(clean.split(/[^a-z0-9]+/).filter(Boolean));
+  const has = (kw) => {
+    if (/[^a-z0-9]/.test(kw)) return clean.includes(kw); // 'ci/cd', 'multi-tenant'
+    if (kw.length <= 4) return tokens.has(kw); // 'api', 'auth', 'aws'
+    return new RegExp(`\\b${kw}`).test(clean); // 'payment(s)', 'deploy(ment)', 'scal(e/able)'
+  };
 
   // 2. High-scope keyword complexity
   const highScope = ['scale', 'database', 'compliance', 'migration', 'payment', 'billing', 'architect', 'reliability', 'deploy', 'security', 'auth', 'multi-tenant'];
   for (const word of highScope) {
-    if (clean.includes(word)) score += 0.5;
+    if (has(word)) score += 0.5;
   }
 
   // 3. Technical integration complexity
   const integrations = ['api', 'pipeline', 'kubernetes', 'aws', 'cloud', 'ci/cd', 'integration'];
   let intCount = 0;
   for (const word of integrations) {
-    if (clean.includes(word)) intCount++;
+    if (has(word)) intCount++;
   }
   score += Math.min(2, intCount * 0.4);
 

@@ -222,6 +222,7 @@ export default function CommandCenter() {
             employees: getEligiblePool(),
             synergyOf,
             balance,
+            skillVector: aiResult.skills,
           });
 
           // Inject Gemini custom task descriptions into the result members
@@ -323,6 +324,14 @@ export default function CommandCenter() {
     return articulationIds.map((id) => peopleById[id]).filter(Boolean);
   }, [graph, peopleById]);
 
+  // Department columns = the fixed order plus any extra departments present among the
+  // drafted members (e.g. Marketing or a custom dept added via the Roster), so no
+  // allocated member is silently dropped from the recommendation grid.
+  const recommendedDepts = useMemo(() => {
+    const present = [...new Set((result?.members || []).map((m) => m.employee.department))];
+    return [...DEPT_ORDER, ...present.filter((d) => !DEPT_ORDER.includes(d))];
+  }, [result]);
+
   const v = (m) => (m.value !== undefined ? m.value : (orgFixed ? m.after : m.before));
   const tone = (kind) => (orgFixed ? 'good' : kind);
 
@@ -353,9 +362,9 @@ export default function CommandCenter() {
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
         <StatCard label={scoreboard.waste.label} value={v(scoreboard.waste)} unit="%" tone={tone('bad')} hero={!orgFixed} icon={Activity} sub="Resource waste coefficient" />
         <StatCard label={scoreboard.idle.label} value={v(scoreboard.idle)} unit="%" tone={tone('warn')} icon={Coins} sub="Unused bench capacity" />
-        <StatCard label={scoreboard.burnout.label} value={v(scoreboard.burnout)} tone={tone('bad')} icon={Flame} sub="Overloaded (util > 90%)" />
+        <StatCard label={scoreboard.burnout.label} value={burnoutList.length} tone={tone('bad')} icon={Flame} sub="Overloaded (util > 90%)" />
         <StatCard label={scoreboard.meta.label} value={v(scoreboard.meta)} tone={tone('violet')} icon={Scale} sub="Role balance quotient" />
-        <StatCard label={scoreboard.spof.label} value={v(scoreboard.spof)} tone={tone('bad')} icon={GitFork} sub="Network articulation nodes" />
+        <StatCard label={scoreboard.spof.label} value={spofList.length} tone={tone('bad')} icon={GitFork} sub="Network articulation nodes" />
       </div>
 
       {/* Core Grid */}
@@ -615,7 +624,7 @@ export default function CommandCenter() {
           </div>
 
           <div className="grid gap-3 md:grid-cols-3 lg:grid-cols-5">
-            {DEPT_ORDER.map((dept) => {
+            {recommendedDepts.map((dept) => {
               const members = memberByDept(dept);
               return (
                 <div key={dept} className="panel bg-panel/30 p-3">
